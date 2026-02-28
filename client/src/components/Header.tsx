@@ -1,4 +1,4 @@
-import { Wine, FileDown } from "lucide-react";
+import { Martini, FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface HeaderProps {
@@ -10,7 +10,7 @@ export function Header({ onExport }: HeaderProps) {
     <header className="sticky top-0 z-40 border-b bg-white/80 backdrop-blur">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
         <div className="flex items-center gap-2">
-          <Wine className="h-6 w-6" />
+          <Martini className="h-6 w-6" />
           <span className="text-xl font-semibold tracking-tight">
             Cocktail Composer
           </span>

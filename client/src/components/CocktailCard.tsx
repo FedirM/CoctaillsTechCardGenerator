@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, Pencil, Trash2 } from "lucide-react";
+import { GripVertical, Pencil, Trash2, Check } from "lucide-react";
 import type { Cocktail } from "@/types/cocktail";
 import { Input } from "@/components/ui/input";
 import {
@@ -15,6 +15,7 @@ import { ImageUpload } from "./ImageUpload";
 import { RichTextEditor } from "./RichTextEditor";
 
 const GLASS_OPTIONS = ["Highball", "Rocks", "Coupe", "Nick&Nora", "Bordo"] as const;
+const METHOD_OPTIONS = ["Stir", "Shake", "Build"] as const;
 const ICE_OPTIONS = ["Crushed Ice", "Ice Cubes", "Large Cube"] as const;
 const DEBOUNCE_MS = 500;
 
@@ -101,10 +102,27 @@ export function CocktailCard({
     onUpdate({ glass: value });
   }
 
+  function handleMethodChange(value: string) {
+    setLocalData((prev) => ({ ...prev, method: value }));
+    onUpdate({ method: value });
+  }
+
   function handleIceChange(value: string) {
     const ice = value === "none" ? "" : value;
     setLocalData((prev) => ({ ...prev, ice }));
     onUpdate({ ice });
+  }
+
+  function handleDoneEditing() {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    const pending: Partial<Omit<Cocktail, "id">> = {};
+    if (localData.name !== cocktail.name) pending.name = localData.name;
+    if (localData.description !== cocktail.description) pending.description = localData.description;
+    if (Object.keys(pending).length > 0) onUpdate(pending);
+    onEdit();
   }
 
   if (editing) {
@@ -130,8 +148,15 @@ export function CocktailCard({
               placeholder="Cocktail name"
               value={localData.name}
               onChange={(e) => handleFieldChange("name", e.target.value)}
-              className="flex-1 text-lg font-semibold"
+              className="min-w-0 flex-1 text-lg font-semibold"
             />
+            <button
+              onClick={handleDoneEditing}
+              className="shrink-0 rounded-lg bg-green-50 p-2 text-green-600 hover:bg-green-100 hover:text-green-700"
+              title="Done editing"
+            >
+              <Check className="h-5 w-5" />
+            </button>
           </div>
 
           <div className="flex gap-3">
@@ -148,12 +173,18 @@ export function CocktailCard({
               </SelectContent>
             </Select>
 
-            <Input
-              placeholder="Method (e.g. Stir, Shake, Build)"
-              value={localData.method}
-              onChange={(e) => handleFieldChange("method", e.target.value)}
-              className="flex-1"
-            />
+            <Select value={localData.method} onValueChange={handleMethodChange}>
+              <SelectTrigger className="w-44">
+                <SelectValue placeholder="Method" />
+              </SelectTrigger>
+              <SelectContent>
+                {METHOD_OPTIONS.map((m) => (
+                  <SelectItem key={m} value={m}>
+                    {m}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
             <Select value={localData.ice || "none"} onValueChange={handleIceChange}>
               <SelectTrigger className="w-44">

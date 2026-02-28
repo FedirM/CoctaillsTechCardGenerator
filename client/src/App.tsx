@@ -30,7 +30,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header onExport={() => pdfRef.current?.exportPdf()} />
-      <CreateButton onCreate={create} />
+      <CreateButton onCreate={() => { create(); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
 
       <main className="mx-auto max-w-5xl px-6 py-8">
         {cocktails.length === 0 ? (

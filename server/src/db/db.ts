@@ -4,7 +4,14 @@ import { Cocktail } from "../types/cocktail";
 
 const DB_PATH = path.join(__dirname, "cocktails.json");
 
+function ensureDbFile(): void {
+  if (!fs.existsSync(DB_PATH)) {
+    fs.writeFileSync(DB_PATH, "[]", "utf-8");
+  }
+}
+
 export function readCocktails(): Cocktail[] {
+  ensureDbFile();
   const raw = fs.readFileSync(DB_PATH, "utf-8");
   return JSON.parse(raw) as Cocktail[];
 }
